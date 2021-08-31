@@ -1,167 +1,119 @@
 class Cell {
-    #size;
-    #walls;
-    #row;
-    #col;
-    #neighbours;
+  #size;
+  #walls;
+  #row;
+  #col;
+  #isBacktracking;
+  // Boolean that will store if the cell is visited or not
+  #visited;
 
-    // Boolean that will store if the cell is visited or not
-    #visited;
+  // Accepts a size variable, row and col
+  constructor(size, row, col) {
+    this.#size = size;
+    this.#row = row;
+    this.#col = col;
+    // By default all the cells are not visited
+    this.#visited = false;
 
-    // Accepts a size variable, row and col
-    constructor(size, row, col) {
-        this.#size = size;
-        this.#row = row;
-        this.#col = col;
-        this.#neighbours = [];
-        // By default all the cells are not visited
-        this.#visited = false;
+    // This variable is used to state if the
+    // current cell is backtracked or not.
+    // By default all cells are set
+    // backtracking to false.
+    this.#isBacktracking = false;
 
-        // Create object which will store the walls state,
-        // open false and closed true. By default all walls
-        // are closed.
-        this.#walls = {
-            top: true,
-            bottom: true,
-            left: true,
-            right: true,
-        };
+    // Create object which will store the walls state,
+    // open false and closed true. By default all walls
+    // are closed.
+    this.#walls = {
+      top: true,
+      bottom: true,
+      left: true,
+      right: true,
+    };
+  }
+
+  // This method will draw borders of the cell
+  // and rectangles as cells
+  show() {
+    fill(0, 0, 0);
+    noStroke();
+    if (this.#visited) {
+      fill(255, 0, 0);
+    }
+    if (this.#isBacktracking) {
+      fill(255, 255, 255);
+    }
+    rect(
+      this.#col * this.#size,
+      this.#row * this.#size,
+      this.#size,
+      this.#size
+    );
+
+    if (this.#walls.top) {
+      stroke(0);
+      line(
+        this.#col * this.#size,
+        this.#row * this.#size,
+        this.#col * this.#size + this.#size,
+        this.#row * this.#size
+      );
+    }
+    // Bottom line
+    if (this.#walls.bottom) {
+      stroke(0);
+      line(
+        this.#col * this.#size,
+        this.#row * this.#size + this.#size,
+        this.#col * this.#size + this.#size,
+        this.#row * this.#size + this.#size
+      );
     }
 
-    // This method will draw borders of the cell
-    show() {
-        // Each cell has four lines which are its walls
-        // Top line
-
-        if (!this.#walls.top) {
-            stroke(200, 200, 200);
-        } else {
-            stroke(0, 0, 0);
-        }
-
-        line(
-            this.#col * this.#size,
-            this.#row * this.#size,
-            this.#col * this.#size + this.#size,
-            this.#row * this.#size
-        );
-        // Bottom line
-        if (!this.#walls.bottom) {
-            stroke(200, 200, 200);
-        } else {
-            stroke(0, 0, 0);
-        }
-        line(
-            this.#col * this.#size,
-            this.#row * this.#size + this.#size,
-            this.#col * this.#size + this.#size,
-            this.#row * this.#size + this.#size
-        );
-
-        // Left line
-        if (!this.#walls.left) {
-            stroke(200, 200, 200);
-        } else {
-            stroke(0, 0, 0);
-        }
-        line(
-            this.#col * this.#size,
-            this.#row * this.#size,
-            this.#col * this.#size,
-            this.#row * this.#size + this.#size
-        );
-
-        if (!this.#walls.right) {
-            stroke(200, 200, 200);
-        } else {
-            stroke(0, 0, 0);
-        }
-        // Right line
-        line(
-            this.#col * this.#size + this.#size,
-            this.#row * this.#size,
-            this.#col * this.#size + this.#size,
-            this.#row * this.#size + this.#size
-        );
+    // Left line
+    if (this.#walls.left) {
+      stroke(0);
+      line(
+        this.#col * this.#size,
+        this.#row * this.#size,
+        this.#col * this.#size,
+        this.#row * this.#size + this.#size
+      );
     }
-
-    // // The neighbourCell is the cell object
-    // // that is neighbour to current cell.
-    // addNeighbour(neighbourCell) {
-    //     this.#neighbours.push(neighbourCell);
-    // }
-
-    // // The neighbourCell is cell object that is
-    // // supposed to be removed neighbours array.
-    // removeNeighbour(neighbourCell) {
-    //     let newArray = [];
-    //     for (let i = 0; i < this.#neighbours.length; i++) {
-    //         if (this.#neighbours[i] !== neighbourCell) {
-    //             newArray.push(this.#neighbours[i]);
-    //         }
-    //     }
-
-    //     this.#neighbours = newArray;
-    // }
-
-    // Getters and setter methods
-    isWall(wallDirection) {
-        return this.#walls[wallDirection];
+    // Right line
+    if (this.#walls.right) {
+      stroke(0);
+      line(
+        this.#col * this.#size + this.#size,
+        this.#row * this.#size,
+        this.#col * this.#size + this.#size,
+        this.#row * this.#size + this.#size
+      );
     }
+  }
 
-    setWallOpen(wallDirection, color) {
-        if (color === "green") {
-            stroke(0, 255, 0);
-        }
-        if (color === "white") {
-            stroke(255, 255, 255);
-        }
-        if (wallDirection === "top") {
-            line(
-                this.#col * this.#size,
-                this.#row * this.#size,
-                this.#col * this.#size + this.#size,
-                this.#row * this.#size
-            );
-        } else if (wallDirection === "bottom") {
-            line(
-                this.#col * this.#size,
-                this.#row * this.#size + this.#size,
-                this.#col * this.#size + this.#size,
-                this.#row * this.#size + this.#size
-            );
-        } else if (wallDirection === "left") {
-            line(
-                this.#col * this.#size,
-                this.#row * this.#size,
-                this.#col * this.#size,
-                this.#row * this.#size + this.#size
-            );
-        } else if (wallDirection === "right") {
-            line(
-                this.#col * this.#size + this.#size,
-                this.#row * this.#size,
-                this.#col * this.#size + this.#size,
-                this.#row * this.#size + this.#size
-            );
-        }
+  // Getters and setter methods
+  isWall(wallDirection) {
+    return this.#walls[wallDirection];
+  }
 
-        // noStroke();
-        // fill(0, 255, 0);
-        // rect(
-        //     this.#row * this.#size,
-        //     this.#col * this.#size,
-        //     this.#size,
-        //     this.#size
-        // );
-        this.#walls[wallDirection] = false;
-    }
+  setWallOpen(wallDirection) {
+    this.#walls[wallDirection] = false;
+  }
 
-    getRowIndex() {
-        return this.#row;
-    }
+  getRowIndex() {
+    return this.#row;
+  }
 
-    getColIndex() {
-        return this.#col;
-    }
+  getColIndex() {
+    return this.#col;
+  }
+
+  setIsVisited() {
+    this.#visited = true;
+  }
+
+  setIsBacktracking() {
+    this.#isBacktracking = true;
+  }
 }
